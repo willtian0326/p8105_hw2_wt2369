@@ -166,7 +166,9 @@ trashwheels_df =
 trashwheels_df
 ```
 
+### Dataset Description:
 
+In total, Mr. Trash Wheel, Professor Trash Wheel, and Gwynnda collected `r nrow(trashwheels_df)` dumpsters of trash, each contributing `r nrow(mrtrashwheel_df)`, `r nrow(professor_df)`, and `r nrow(gwynnda_df)` dumpsters, respectively. The dataset includes basic information of trash collected such as dumpster number, date, weight, and volume, as well as more detailed information regarding the composition of trash being collected like number of plastic bottles, cigarette butts, etc. Professor Trash Wheel collected a total of `r sum(pull(professor_df, weight_tons))` tons of trash. In July of 2021, Gwynnda collected a total of `r sum(pull(gwynnda_df, cigarette_butts)[1:5]) |> format(scientific = FALSE)` cigarette butts.
 
 
 
