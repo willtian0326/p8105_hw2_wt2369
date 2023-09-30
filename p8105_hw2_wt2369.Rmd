@@ -7,6 +7,7 @@ output: github_document
 
 ```{r, message=FALSE}
 library(tidyverse)
+library(readxl)
 ```
 
 ## Problem 1
@@ -82,4 +83,91 @@ result =
 
 result
 ```
+
+## Problem 2
+
+Importing and cleaning the Mr. Trash Wheel dataset:
+
+```{r}
+mrtrashwheel_df =
+  read_excel(
+    "data/trashwheel.xlsx",
+    sheet = 1,
+    range = "A2:N549") |>
+  janitor::clean_names() |>
+  mutate(year = as.numeric(year))
+```
+
+Calculating `homes_powered` variable based on note:
+
+* Homes Powered - Each ton of trash equates to on average 500 kilowatts of electricity.  An average household will use 30 kilowatts per day.
+
+```{r}
+mrtrashwheel_df =
+  mutate(
+    mrtrashwheel_df,
+    homes_powered = weight_tons * 500 / 30
+  )
+
+mrtrashwheel_df
+```
+
+Same process for Professor Trash Wheel and Gwynnda:
+
+```{r}
+professor_df =
+  read_excel(
+    "data/trashwheel.xlsx",
+    sheet = 2,
+    range = "A2:M96") |>
+  janitor::clean_names() |>
+  mutate(homes_powered = weight_tons * 500 / 30)
+
+professor_df
+
+gwynnda_df =
+  read_excel(
+    "data/trashwheel.xlsx",
+    sheet = 4,
+    range = "A2:K108") |>
+  janitor::clean_names() |>
+  mutate(homes_powered = weight_tons * 500 / 30)
+
+gwynnda_df
+```
+
+Combining 3 datasets:
+
+```{r}
+mrtrashwheel_df =
+  mutate(
+    mrtrashwheel_df,
+    trashwheel = "mr_trashwheel"
+  ) |>
+  relocate(trashwheel)
+
+professor_df =
+  mutate(
+    professor_df,
+    trashwheel = "professor_trashwheel"
+  ) |>
+  relocate(trashwheel)
+
+gwynnda_df =
+  mutate(
+    gwynnda_df,
+    trashwheel = "gwynnda"
+  ) |>
+  relocate(trashwheel)
+
+trashwheels_df = 
+  bind_rows(mrtrashwheel_df, professor_df, gwynnda_df)
+
+trashwheels_df
+```
+
+
+
+
+
 
