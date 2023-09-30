@@ -23,6 +23,7 @@ pols_df =
   read_csv("data/pols-month.csv") |>
   janitor::clean_names() |>
   separate(mon, into = c('year', 'month', 'day'), '-') |>  # separate into year, month, and day
+  mutate(year = as.numeric(year)) |>
   mutate(month = as.numeric(month)) |> 
   mutate(month = month_names[month]) |>                    # changing month num to month name
   mutate(                                                  # adding president variable
@@ -55,5 +56,30 @@ snp_df =
   relocate(year)
 
 snp_df
+```
+
+Importing and cleaning unemployment.csv:
+
+```{r}
+unemployment_df =
+  read_csv("data/unemployment.csv") |>
+  pivot_longer(
+    Jan:Dec,
+    names_to = "month",
+    values_to = "unemployment_rate"
+  ) |>
+  janitor::clean_names()
+
+unemployment_df
+```
+
+Merging the 3 datasets together:
+
+```{r}
+result =
+  left_join(pols_df, snp_df) |>
+  left_join(unemployment_df)
+
+result
 ```
 
