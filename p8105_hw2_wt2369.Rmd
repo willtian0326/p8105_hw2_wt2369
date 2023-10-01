@@ -170,6 +170,44 @@ trashwheels_df
 
 In total, Mr. Trash Wheel, Professor Trash Wheel, and Gwynnda collected `r nrow(trashwheels_df)` dumpsters of trash, each contributing `r nrow(mrtrashwheel_df)`, `r nrow(professor_df)`, and `r nrow(gwynnda_df)` dumpsters, respectively. The dataset includes basic information of trash collected such as dumpster number, date, weight, and volume, as well as more detailed information regarding the composition of trash being collected like number of plastic bottles, cigarette butts, etc. Professor Trash Wheel collected a total of `r sum(pull(professor_df, weight_tons))` tons of trash. In July of 2021, Gwynnda collected a total of `r sum(pull(gwynnda_df, cigarette_butts)[1:5]) |> format(scientific = FALSE)` cigarette butts.
 
+## Problem 3
 
+Import baseline demographics dataset:
+
+```{r}
+baseline_df =
+  read_csv("data/MCI_baseline.csv", skip = 1) |>
+  janitor::clean_names() |>
+  mutate(
+    sex = case_match(
+      sex,
+      1 ~ "male",
+      0 ~ "female"
+    ),
+    apoe4 = case_match(
+      apoe4,
+      1 ~ "carrier",
+      0 ~ "non-carrier"
+    )
+  ) |>
+  filter(current_age < age_at_onset | age_at_onset == ".")
+
+baseline_df
+
+developed_mci = nrow(filter(baseline_df, age_at_onset != "."))
+
+mean_age = mean(pull(baseline_df, current_age))
+
+female_count = nrow(filter(baseline_df, sex == "female"))
+
+male_count = nrow(filter(baseline_df, sex == "male"))
+
+female_carrier_proportion = 
+  nrow(filter(baseline_df, sex == "female" & apoe4 == "carrier")) / female_count * 100
+
+baseline_df
+```
+
+After importing the file, sex and carrier variables were converted from numeric to descriptive for clarity. 4 participants who developed MCI onset before the study were removed. Out of the remaining `r female_count + male_count` participants, `r female_count` were female, and `r male_count` were male. The average baseline age is `r mean_age`. In total, `r developed_mci` participants developed MCI during the followup period. Out of the `r female_count` female participants, `r female_carrier_proportion`% were APOE4 carriers.
 
 
