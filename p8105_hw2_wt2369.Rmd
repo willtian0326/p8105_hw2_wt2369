@@ -12,7 +12,7 @@ library(readxl)
 
 ## Problem 1
 
-Importing and cleaning pol-months.csv dataset:
+__Importing and cleaning pol-months.csv dataset:__
 
 ```{r}
 month_names = c("Jan","Feb","Mar",
@@ -39,7 +39,7 @@ pols_df =
 pols_df
 ```
 
-Importing and cleaning snp.csv dataset:
+__Importing and cleaning snp.csv dataset:__
 
 ```{r}
 snp_df = 
@@ -59,7 +59,7 @@ snp_df =
 snp_df
 ```
 
-Importing and cleaning unemployment.csv:
+__Importing and cleaning unemployment.csv:__
 
 ```{r}
 unemployment_df =
@@ -74,7 +74,7 @@ unemployment_df =
 unemployment_df
 ```
 
-Merging the 3 datasets together:
+__Merging the 3 datasets together:__
 
 ```{r}
 result =
@@ -86,7 +86,7 @@ result
 
 ## Problem 2
 
-Importing and cleaning the Mr. Trash Wheel dataset:
+__Importing and cleaning the Mr. Trash Wheel dataset:__
 
 ```{r}
 mrtrashwheel_df =
@@ -98,7 +98,7 @@ mrtrashwheel_df =
   mutate(year = as.numeric(year))
 ```
 
-Calculating `homes_powered` variable based on note:
+__Calculating `homes_powered` variable based on note:__
 
 * Homes Powered - Each ton of trash equates to on average 500 kilowatts of electricity.  An average household will use 30 kilowatts per day.
 
@@ -112,7 +112,7 @@ mrtrashwheel_df =
 mrtrashwheel_df
 ```
 
-Same process for Professor Trash Wheel and Gwynnda:
+__Same process for Professor Trash Wheel and Gwynnda:__
 
 ```{r}
 professor_df =
@@ -136,7 +136,7 @@ gwynnda_df =
 gwynnda_df
 ```
 
-Combining 3 datasets:
+__Combining 3 datasets:__
 
 ```{r}
 mrtrashwheel_df =
@@ -166,13 +166,13 @@ trashwheels_df =
 trashwheels_df
 ```
 
-### Dataset Description:
+__Dataset Description:__
 
 In total, Mr. Trash Wheel, Professor Trash Wheel, and Gwynnda collected `r nrow(trashwheels_df)` dumpsters of trash, each contributing `r nrow(mrtrashwheel_df)`, `r nrow(professor_df)`, and `r nrow(gwynnda_df)` dumpsters, respectively. The dataset includes basic information of trash collected such as dumpster number, date, weight, and volume, as well as more detailed information regarding the composition of trash being collected like number of plastic bottles, cigarette butts, etc. Professor Trash Wheel collected a total of `r sum(pull(professor_df, weight_tons))` tons of trash. In July of 2021, Gwynnda collected a total of `r sum(pull(gwynnda_df, cigarette_butts)[1:5]) |> format(scientific = FALSE)` cigarette butts.
 
 ## Problem 3
 
-Import baseline demographics dataset:
+__Import baseline demographics dataset:__
 
 ```{r}
 baseline_df =
@@ -208,6 +208,51 @@ female_carrier_proportion =
 baseline_df
 ```
 
+__Dataset description:__
+
 After importing the file, sex and carrier variables were converted from numeric to descriptive for clarity. 4 participants who developed MCI onset before the study were removed. Out of the remaining `r female_count + male_count` participants, `r female_count` were female, and `r male_count` were male. The average baseline age is `r mean_age`. In total, `r developed_mci` participants developed MCI during the followup period. Out of the `r female_count` female participants, `r female_carrier_proportion`% were APOE4 carriers.
 
+__Import Amyloid biomarker dataset:__
+
+```{r}
+amyloid_df =
+  read_csv(
+    "data/mci_amyloid.csv", 
+    skip = 1,
+    na = c("Na", "NA")) |>
+  janitor::clean_names()
+
+colnames(amyloid_df)[1] = "id"
+
+amyloid_df
+
+nrow(amyloid_df) - nrow(drop_na(amyloid_df))
+```
+
+__Dataset description:__
+
+After importing the data, the first column was changed from "study_id" to "id" for consistency with `baseline_df`. Also, there were both "NA"s and "Na"s in the dataset, so it had to be specified while reading in the csv file. The dataset shows APOE4 values at the baseline and 4 timepoints after that with 2-year increments. It contains data of `r nrow(amyloid_df)` participants, `r nrow(amyloid_df) - nrow(drop_na(amyloid_df))` of which are missing one or more APOE4 values. I decided not to drop entries with missing values, as they still contain valuable information.
+
+__Check whether some participants appear in only the baseline or amyloid datasets:__
+
+```{r}
+baseline_only =  nrow(baseline_df) - nrow(filter(baseline_df, id %in% pull(amyloid_df, id)))
+
+amyloid_only = nrow(amyloid_df) - nrow(filter(amyloid_df, id %in% pull(baseline_df, id)))
+```
+
+`r baseline_only` participants were only found in the baseline dataset, whereas `r amyloid_only` participants were only found in the amyloid dataset. 
+
+__Combining demographic and biomarker datasets:__
+
+```{r}
+baseline_amyloid_df =
+  merge(baseline_df, amyloid_df, by = "id")
+
+write_csv(baseline_amyloid_df, "data/baseline_amyloid.csv")
+```
+
+__Dataset description:__
+
+The combined dataset contains information of `r nrow(baseline_amyloid_df)` participants who appear in both baseline and amyloid datasets, including basic demographic information and APOE4 values across 5 different timepoints.
 
