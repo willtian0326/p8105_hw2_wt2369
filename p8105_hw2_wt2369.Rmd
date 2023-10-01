@@ -254,5 +254,5 @@ write_csv(baseline_amyloid_df, "data/baseline_amyloid.csv")
 
 __Dataset description:__
 
-The combined dataset contains information of `r nrow(baseline_amyloid_df)` participants who appear in both baseline and amyloid datasets, including basic demographic information and APOE4 values across 5 different timepoints.
+The combined dataset contains information of `r nrow(baseline_amyloid_df)` participants who appear in both baseline and amyloid datasets, including basic demographic information and APOE4 values across 5 different timepoints. The resulting dataset is exported to `baseline_amyloid.csv` under the `data` directory.
 
