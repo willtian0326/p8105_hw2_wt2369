@@ -264,10 +264,17 @@ __Combining demographic and biomarker datasets:__
 baseline_amyloid_df =
   merge(baseline_df, amyloid_df, by = "id")
 
-write_csv(baseline_amyloid_df, "data/baseline_amyloid_combined.csv")
+write_csv(baseline_amyloid_df, "data/baseline_amyloid.csv")
+
+baseline_amyloid_longer_df =
+  left_join(amyloid_longer_df, baseline_df) |>
+  relocate(timepoint, .after = age_at_onset) |>
+  relocate(apoe, .after = timepoint)
+
+write_csv(baseline_amyloid_longer_df, "data/baseline_amyloid_longer.csv")
 ```
 
 __Dataset description:__
 
-The combined dataset contains information of `r nrow(baseline_amyloid_df)` participants who appear in both baseline and amyloid datasets, including basic demographic information and APOE4 values across 5 different timepoints. The resulting dataset is exported to `baseline_amyloid_combined.csv` under the `data` directory.
+The combined dataset contains information of `r nrow(baseline_amyloid_df)` participants who appear in both baseline and amyloid datasets, including basic demographic information and APOE4 values across 5 different timepoints. The resulting dataset is exported to `baseline_amyloid.csv` under the `data` directory. As suggested by TAs, I also created another csv file by joining `baseline_df` and `amyloid_longer_df`. The result is exported to `baseline_amyloid_longer.csv`. 
 
